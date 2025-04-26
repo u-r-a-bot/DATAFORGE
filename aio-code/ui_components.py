@@ -15,12 +15,33 @@ from story_assistant import (
     solve_plot_problem,
     generate_dialogue
 )
+from translations import get_translations, AVAILABLE_LANGUAGES
 
 def sidebar_content():
-    st.sidebar.title("Author's AI Assistant")
+    # Get translations for current language
+    t = get_translations(st.session_state.language)
+    
+    st.sidebar.title(t["app_title"])
+    
+    # Language selector
+    language_options = list(AVAILABLE_LANGUAGES.values())
+    language_keys = list(AVAILABLE_LANGUAGES.keys())
+    
+    selected_language_display = st.sidebar.selectbox(
+        t["language_label"],
+        options=language_options,
+        index=language_keys.index(st.session_state.language)
+    )
+    
+    # Update the language in session state when changed
+    selected_language_key = language_keys[language_options.index(selected_language_display)]
+    if selected_language_key != st.session_state.language:
+        st.session_state.language = selected_language_key
+        st.session_state.story_context["language"] = selected_language_key
+        st.rerun()
     
     # API Key input
-    api_key = st.sidebar.text_input("Google API Key", type="password", value=st.session_state.api_key)
+    api_key = st.sidebar.text_input(t["api_key_label"], type="password", value=st.session_state.api_key)
     if api_key:
         st.session_state.api_key = api_key
     
@@ -28,40 +49,60 @@ def sidebar_content():
     
     # Navigation menu
     page = st.sidebar.radio(
-        "Navigate",
-        ["Story Setup", "Characters", "Settings", "Plot Elements", 
-         "Chapter Generator", "Plot Analysis", "Creative Branches",
-         "Character Arcs", "Plot Outline", "Dialogue Generator", 
-         "Plot Problem Solver", "Export/Import"]
+        t["navigate"],
+        [t["nav_story_setup"], t["nav_characters"], t["nav_settings"], t["nav_plot_elements"], 
+         t["nav_chapter_generator"], t["nav_plot_analysis"], t["nav_creative_branches"],
+         t["nav_character_arcs"], t["nav_plot_outline"], t["nav_dialogue_generator"], 
+         t["nav_plot_problem_solver"], t["nav_export_import"]]
     )
     
     st.sidebar.divider()
     
     # Story status display
-    st.sidebar.subheader("Story Status")
+    st.sidebar.subheader(t["story_status"])
     
     if st.session_state.story_context["title"]:
-        st.sidebar.write(f"**Title:** {st.session_state.story_context['title']}")
-        st.sidebar.write(f"**Genre:** {st.session_state.story_context['genre']}")
-        st.sidebar.write(f"**Target Age:** {st.session_state.story_context['target_age_group'].replace('_', ' ').title()}")
-        st.sidebar.write(f"**Characters:** {len(st.session_state.story_context['characters'])}")
-        st.sidebar.write(f"**Settings:** {len(st.session_state.story_context['settings'])}")
-        st.sidebar.write(f"**Plot Elements:** {len(st.session_state.story_context['plot_elements'])}")
-        st.sidebar.write(f"**Chapters Created:** {len(st.session_state.chapters)}")
+        st.sidebar.write(f"**{t['story_title_label']}:** {st.session_state.story_context['title']}")
+        st.sidebar.write(f"**{t['genre_label']}:** {st.session_state.story_context['genre']}")
+        st.sidebar.write(f"**{t['target_age_group_label']}:** {st.session_state.story_context['target_age_group'].replace('_', ' ').title()}")
+        st.sidebar.write(f"**{t['language_label']}:** {AVAILABLE_LANGUAGES[st.session_state.story_context['language']]}")
+        st.sidebar.write(f"**{t['nav_characters']}:** {len(st.session_state.story_context['characters'])}")
+        st.sidebar.write(f"**{t['nav_settings']}:** {len(st.session_state.story_context['settings'])}")
+        st.sidebar.write(f"**{t['nav_plot_elements']}:** {len(st.session_state.story_context['plot_elements'])}")
+        st.sidebar.write(f"**{t['nav_chapter_generator']}:** {len(st.session_state.chapters)}")
     else:
-        st.sidebar.info("Start by setting up your story on the Story Setup page")
+        st.sidebar.info(t["start_setup"])
     
-    return page
+    # Convert page name back to English for routing
+    page_mapping = {
+        t["nav_story_setup"]: "Story Setup",
+        t["nav_characters"]: "Characters",
+        t["nav_settings"]: "Settings",
+        t["nav_plot_elements"]: "Plot Elements",
+        t["nav_chapter_generator"]: "Chapter Generator",
+        t["nav_plot_analysis"]: "Plot Analysis",
+        t["nav_creative_branches"]: "Creative Branches",
+        t["nav_character_arcs"]: "Character Arcs",
+        t["nav_plot_outline"]: "Plot Outline",
+        t["nav_dialogue_generator"]: "Dialogue Generator",
+        t["nav_plot_problem_solver"]: "Plot Problem Solver",
+        t["nav_export_import"]: "Export/Import"
+    }
+    
+    return page_mapping.get(page, "Story Setup")
 
 def story_setup_page():
-    st.header("Story Setup")
+    # Get translations for current language
+    t = get_translations(st.session_state.language)
+    
+    st.header(t["story_setup_header"])
     
     # Basic story setup form
     with st.form("story_setup_form"):
         col1, col2 = st.columns(2)
         
         with col1:
-            title = st.text_input("Story Title", value=st.session_state.story_context["title"])
+            title = st.text_input(t["story_title_label"], value=st.session_state.story_context["title"])
             
             genre_options = [
                 "fantasy", "science_fiction", "mystery", "thriller", 
@@ -69,7 +110,7 @@ def story_setup_page():
                 "adventure", "dystopian"
             ]
             genre = st.selectbox(
-                "Genre",
+                t["genre_label"],
                 options=genre_options,
                 index=genre_options.index(st.session_state.story_context["genre"]) if st.session_state.story_context["genre"] in genre_options else 0
             )
@@ -88,7 +129,7 @@ def story_setup_page():
             selected_index = age_group_values.index(st.session_state.story_context["target_age_group"]) if st.session_state.story_context["target_age_group"] in age_group_values else 2  # Default to YA
             
             age_group_selected = st.selectbox(
-                "Target Age Group",
+                t["target_age_group_label"],
                 options=age_group_display,
                 index=selected_index
             )
@@ -96,17 +137,17 @@ def story_setup_page():
             # Map the selected display value back to the actual value
             selected_age_group = age_group_values[age_group_display.index(age_group_selected)]
         
-        submit_button = st.form_submit_button("Save Story Settings")
+        submit_button = st.form_submit_button(t["save_story_settings_button"])
         
         if submit_button:
             st.session_state.story_context["title"] = title
             st.session_state.story_context["genre"] = genre
             st.session_state.story_context["target_age_group"] = selected_age_group
-            st.success("Story setup saved successfully!")
+            st.success(t["story_saved_success"])
     
     # Display audience-specific writing guidelines
     if st.session_state.story_context["target_age_group"]:
-        st.subheader("Writing Guidelines for Target Audience")
+        st.subheader(t["writing_guidelines_header"])
         age_group = st.session_state.story_context["target_age_group"]
         guidelines = get_audience_guidelines(age_group)
         
@@ -114,24 +155,27 @@ def story_setup_page():
             col1, col2 = st.columns(2)
             
             with col1:
-                st.markdown("**Vocabulary Level**")
+                st.markdown(f"**{t['vocabulary_level']}**")
                 st.write(guidelines.get("vocabulary_level", "Not specified"))
                 
-                st.markdown("**Sentence Structure**")
+                st.markdown(f"**{t['sentence_structure']}**")
                 st.write(guidelines.get("sentence_structure", "Not specified"))
                 
-                st.markdown("**Thematic Elements**")
+                st.markdown(f"**{t['thematic_elements']}**")
                 st.write(guidelines.get("thematic_elements", "Not specified"))
             
             with col2:
-                st.markdown("**Content Boundaries**")
+                st.markdown(f"**{t['content_boundaries']}**")
                 st.write(guidelines.get("content_boundaries", "Not specified"))
                 
-                st.markdown("**Narrative Style**")
+                st.markdown(f"**{t['narrative_style']}**")
                 st.write(guidelines.get("narrative_style", "Not specified"))
 
 def characters_page():
-    st.header("Character Management")
+    # Get translations for current language
+    t = get_translations(st.session_state.language)
+    
+    st.header(t["nav_characters"])
     
     # Character creation form
     with st.form("character_form"):
@@ -194,7 +238,10 @@ def characters_page():
         st.info("No characters added yet. Use the form above to create your first character.")
 
 def settings_page():
-    st.header("Setting Management")
+    # Get translations for current language
+    t = get_translations(st.session_state.language)
+    
+    st.header(t["nav_settings"])
     
     # Setting creation form  
     with st.form("setting_form"):
@@ -240,7 +287,10 @@ def settings_page():
         st.info("No settings added yet. Use the form above to create your first setting.")
 
 def plot_elements_page():
-    st.header("Plot Elements")
+    # Get translations for current language
+    t = get_translations(st.session_state.language)
+    
+    st.header(t["nav_plot_elements"])
     
     # Plot element creation form
     with st.form("plot_element_form"):
@@ -296,7 +346,10 @@ def plot_elements_page():
         st.info("No plot elements added yet. Use the form above to create your first plot element.")
 
 def chapter_generator_page():
-    st.header("Chapter Generator")
+    # Get translations for current language
+    t = get_translations(st.session_state.language)
+    
+    st.header(t["nav_chapter_generator"])
     
     # Check if story is set up
     if not st.session_state.story_context["title"]:
@@ -326,7 +379,7 @@ def chapter_generator_page():
             if not chapter_title or not plot_focus or not current_situation:
                 st.error("Please fill in all required fields")
             else:
-                with st.spinner("Generating chapter with Gemini... This may take a moment."):
+                with st.spinner(f"Generating chapter in {AVAILABLE_LANGUAGES[st.session_state.language]} with Gemini... This may take a moment."):
                     # Call the chapter generation function
                     chapter_content = generate_chapter(
                         st.session_state.story_context,
@@ -378,7 +431,10 @@ def chapter_generator_page():
         st.info("No chapters generated yet. Use the form above to create your first chapter.")
 
 def plot_analysis_page():
-    st.header("Plot Analysis")
+    # Get translations for current language
+    t = get_translations(st.session_state.language)
+    
+    st.header(t["nav_plot_analysis"])
     
     # Check if story is set up
     if not st.session_state.story_context["title"]:
@@ -428,7 +484,7 @@ def plot_analysis_page():
             if not story_excerpt or len(story_excerpt) < 100:
                 st.error("Please provide a substantial story excerpt to analyze (at least 100 characters)")
             else:
-                with st.spinner("Analyzing plot with Gemini... This may take a moment."):
+                with st.spinner(f"Analyzing plot in {AVAILABLE_LANGUAGES[st.session_state.language]} with Gemini... This may take a moment."):
                     # Call the plot analysis function
                     analysis_result = analyze_plot(st.session_state.story_context, story_excerpt)
                     
@@ -463,7 +519,10 @@ def plot_analysis_page():
         st.info("No analyses performed yet. Use the form above to analyze your plot.")
 
 def creative_branches_page():
-    st.header("Creative Branching")
+    # Get translations for current language
+    t = get_translations(st.session_state.language)
+    
+    st.header(t["nav_creative_branches"])
     
     # Check if story is set up
     if not st.session_state.story_context["title"]:
@@ -492,7 +551,7 @@ def creative_branches_page():
             if not current_situation or not decision_point:
                 st.error("Please fill in all required fields")
             else:
-                with st.spinner("Generating story branches with Gemini... This may take a moment."):
+                with st.spinner(f"Generating story branches in {AVAILABLE_LANGUAGES[st.session_state.language]} with Gemini... This may take a moment."):
                     # Call the creative branches function
                     branches = generate_creative_branches(
                         st.session_state.story_context,
@@ -532,7 +591,10 @@ def creative_branches_page():
         st.info("No story branches generated yet. Use the form above to explore different plot directions.")
 
 def character_arc_page():
-    st.header("Character Arc Generator")
+    # Get translations for current language
+    t = get_translations(st.session_state.language)
+    
+    st.header(t["nav_character_arcs"])
     
     # Check if story is set up and has characters
     if not st.session_state.story_context["title"]:
@@ -558,7 +620,7 @@ def character_arc_page():
         submit_button = st.form_submit_button("Generate Character Arc")
         
         if submit_button:
-            with st.spinner("Generating character arc with Gemini... This may take a moment."):
+            with st.spinner(f"Generating character arc in {AVAILABLE_LANGUAGES[st.session_state.language]} with Gemini... This may take a moment."):
                 # Call the character arc suggestion function
                 arc_result = suggest_character_arc(
                     st.session_state.story_context,
@@ -590,7 +652,10 @@ def character_arc_page():
         st.info("No character arcs generated yet. Use the form above to create your first character arc.")
 
 def plot_outline_page():
-    st.header("Plot Outline Generator")
+    # Get translations for current language
+    t = get_translations(st.session_state.language)
+    
+    st.header(t["nav_plot_outline"])
     
     # Check if story is set up
     if not st.session_state.story_context["title"]:
@@ -610,7 +675,7 @@ def plot_outline_page():
         submit_button = st.form_submit_button("Generate Plot Outline")
         
         if submit_button:
-            with st.spinner("Generating plot outline with Gemini... This may take a moment."):
+            with st.spinner(f"Generating plot outline in {AVAILABLE_LANGUAGES[st.session_state.language]} with Gemini... This may take a moment."):
                 # Call the plot outline generation function
                 outline_result = generate_plot_outline(
                     st.session_state.story_context,
@@ -656,7 +721,10 @@ def plot_outline_page():
         st.info("No plot outlines generated yet. Use the form above to create your first plot outline.")
 
 def dialogue_generator_page():
-    st.header("Dialogue Generator")
+    # Get translations for current language
+    t = get_translations(st.session_state.language)
+    
+    st.header(t["nav_dialogue_generator"])
     
     # Check if story is set up and has at least two characters
     if not st.session_state.story_context["title"]:
@@ -707,7 +775,7 @@ def dialogue_generator_page():
             elif not situation:
                 st.error("Please describe the situation")
             else:
-                with st.spinner("Generating dialogue with Gemini... This may take a moment."):
+                with st.spinner(f"Generating dialogue in {AVAILABLE_LANGUAGES[st.session_state.language]} with Gemini... This may take a moment."):
                     # Call the dialogue generation function
                     dialogue_result = generate_dialogue(
                         st.session_state.story_context,
@@ -750,7 +818,10 @@ def dialogue_generator_page():
         st.info("No dialogues generated yet. Use the form above to create your first dialogue scene.")
 
 def plot_problem_solver_page():
-    st.header("Plot Problem Solver")
+    # Get translations for current language
+    t = get_translations(st.session_state.language)
+    
+    st.header(t["nav_plot_problem_solver"])
     
     # Check if story is set up
     if not st.session_state.story_context["title"]:
@@ -773,7 +844,7 @@ def plot_problem_solver_page():
             if not problem_description:
                 st.error("Please describe your plot problem")
             else:
-                with st.spinner("Generating solutions with Gemini... This may take a moment."):
+                with st.spinner(f"Generating solutions in {AVAILABLE_LANGUAGES[st.session_state.language]} with Gemini... This may take a moment."):
                     # Call the plot problem solving function
                     solutions = solve_plot_problem(
                         problem_description,
@@ -798,7 +869,10 @@ def plot_problem_solver_page():
         """)
 
 def export_import_page():
-    st.header("Export & Import")
+    # Get translations for current language
+    t = get_translations(st.session_state.language)
+    
+    st.header(t["nav_export_import"])
     
     col1, col2 = st.columns(2)
     
@@ -828,6 +902,14 @@ def export_import_page():
                 
                 if st.button("Import Story Context"):
                     st.session_state.story_context = story_data
+                    
+                    # Ensure language is set
+                    if "language" not in st.session_state.story_context:
+                        st.session_state.story_context["language"] = "english"
+                    
+                    # Update session language to match imported story
+                    st.session_state.language = st.session_state.story_context["language"]
+                    
                     st.success("Story context imported successfully!")
                     st.rerun()
             except json.JSONDecodeError:

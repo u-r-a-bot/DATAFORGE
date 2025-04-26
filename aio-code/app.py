@@ -31,6 +31,7 @@ from ui_components import (
     plot_problem_solver_page,
     export_import_page
 )
+from translations import get_translations
 
 # Set page configuration
 st.set_page_config(
@@ -46,6 +47,7 @@ if 'story_context' not in st.session_state:
         "title": "",
         "genre": "",
         "target_age_group": "",
+        "language": "english",  # Default language is English
         "characters": [],
         "plot_elements": [],
         "settings": [],
@@ -72,6 +74,10 @@ if 'plot_outlines' not in st.session_state:
 
 if 'dialogues' not in st.session_state:
     st.session_state.dialogues = []
+
+# Set up language if it's not already in session state
+if 'language' not in st.session_state:
+    st.session_state.language = "english"
 
 # Main app logic
 def main():

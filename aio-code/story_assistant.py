@@ -3,7 +3,7 @@ import json
 import streamlit as st
 import google.generativeai as genai
 from typing import Dict, List, Optional, Any
-os.environ['GOOGLE_API_KEY'] = "AIzaSyAMhgUK6Wj-jhJ4pBX7t6US6VyTgAI_Lu0"
+
 # LLM configuration
 def get_api_key():
     """Get Gemini API key from environment or Streamlit secrets"""
@@ -71,6 +71,9 @@ PROMPTS = {
     
     Stylistic Reference:
     Write in a style similar to {author_reference} but with your own unique voice.
+    
+    Language: 
+    Write this chapter in {language}
     """,
     "plot_analysis": """
     Analyze the following story excerpt for plot coherence, character consistency, and pacing.
@@ -90,6 +93,9 @@ PROMPTS = {
     3. Pacing: Does the scene move too quickly or slowly?
     4. Unresolved Threads: Are there dangling plot elements that need addressing?
     5. Suggestions: Provide specific recommendations for improvement.
+    
+    Language: 
+    Write this analysis in {language}
     """,
     "creative_expansion": """
     Generate {num_branches} possible story branches from the current narrative point.
@@ -110,6 +116,9 @@ PROMPTS = {
     4. Generate a short sample passage (100-200 words) demonstrating this branch
     
     Ensure each branch feels distinct and offers meaningful narrative divergence.
+    
+    Language: 
+    Write these story branches in {language}
     """
 }
 
@@ -240,7 +249,8 @@ def generate_chapter(story_context: Dict, chapter_title: str, plot_focus: str,
         author_reference=get_author_reference(
             story_context["genre"], 
             story_context["target_age_group"]
-        )
+        ),
+        language=story_context.get("language", "english")
     )
     
     # Call the LLM API
@@ -262,7 +272,8 @@ def analyze_plot(story_context: Dict, story_excerpt: str) -> str:
         age_group=story_context["target_age_group"],
         characters=characters_str,
         plot_points=plot_points,
-        story_excerpt=story_excerpt
+        story_excerpt=story_excerpt,
+        language=story_context.get("language", "english")
     )
     
     # Call the LLM API
@@ -281,7 +292,8 @@ def generate_creative_branches(story_context: Dict, current_situation: str,
         num_branches=num_branches,
         current_situation=current_situation,
         decision_point=decision_point,
-        character_motivations=character_motivations
+        character_motivations=character_motivations,
+        language=story_context.get("language", "english")
     )
     
     # Call the LLM API
@@ -333,6 +345,9 @@ def suggest_character_arc(story_context: Dict, character_name: str) -> str:
     3. Final state - how they might be different by the end of the story
     4. Thematic relevance - how this arc connects to potential themes of the story
     5. Specific scene ideas (1-2) that would be powerful moments in this character's journey
+    
+    Language: 
+    Write this character arc in {story_context.get("language", "english")}
     """
     
     return call_llm(prompt, max_tokens=1500)
@@ -375,6 +390,9 @@ def generate_plot_outline(story_context: Dict, num_chapters: int = 10) -> str:
     
     Ensure the plot has a clear progression, rising action, climax, and resolution appropriate
     for the target age group. Include chapter titles that evoke interest without revealing too much.
+    
+    Language: 
+    Write this plot outline in {story_context.get("language", "english")}
     """
     
     return call_llm(prompt, max_tokens=2000)
@@ -413,6 +431,9 @@ def solve_plot_problem(problem_description: str, story_context: Dict) -> str:
        - How it might affect character development
        - Any new opportunities it creates for future plot developments
     3. Recommend which solution you think works best and why
+    
+    Language: 
+    Write these solutions in {story_context.get("language", "english")}
     """
     
     return call_llm(prompt, max_tokens=1800)
@@ -460,6 +481,9 @@ def generate_dialogue(story_context: Dict, character1: str, character2: str,
     - Keep the dialogue natural and age-appropriate
     - Ensure distinct voice for each character
     - Include subtext where appropriate
+    
+    Language: 
+    Write this dialogue in {story_context.get("language", "english")}
     """
     
     return call_llm(prompt, max_tokens=1500, temperature=0.75)
