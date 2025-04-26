@@ -1,3 +1,4 @@
+# app.py
 import streamlit as st
 import os
 import json
@@ -32,6 +33,8 @@ from ui_components import (
     export_import_page
 )
 from translations import get_translations
+# Add this new import
+from storage_helper import add_storage_buttons, check_for_loaded_data
 
 # Set page configuration
 st.set_page_config(
@@ -45,8 +48,8 @@ st.set_page_config(
 if 'story_context' not in st.session_state:
     st.session_state.story_context = {
         "title": "",
-        "genre": "",
-        "target_age_group": "",
+        "genre": "fantasy",
+        "target_age_group": "young_adult_13_17",
         "language": "english",  # Default language is English
         "characters": [],
         "plot_elements": [],
@@ -81,8 +84,14 @@ if 'language' not in st.session_state:
 
 # Main app logic
 def main():
+    # Check for loaded data first
+    check_for_loaded_data()
+    
     # Display sidebar and get current page
     current_page = sidebar_content()
+    
+    # Add storage management buttons
+    add_storage_buttons()
     
     # Display the appropriate page based on selection
     if current_page == "Story Setup":

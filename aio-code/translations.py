@@ -415,7 +415,60 @@ TRANSLATIONS = {
         "chinese": "叙事风格",
         "hindi": "कथात्मक शैली",
         "arabic": "أسلوب السرد"
-    }
+    },
+    # Add these entries to your existing TRANSLATIONS dictionary
+"session_management": {
+    "english": "Session Management",
+    "spanish": "Gestión de Sesión",
+    "french": "Gestion de Session",
+    "german": "Sitzungsverwaltung",
+    "italian": "Gestione Sessione",
+    "portuguese": "Gerenciamento de Sessão",
+    "russian": "Управление сессией",
+    "japanese": "セッション管理",
+    "chinese": "会话管理",
+    "hindi": "सत्र प्रबंधन",
+    "arabic": "إدارة الجلسة"
+},
+"save_button": {
+    "english": "Save",
+    "spanish": "Guardar",
+    "french": "Sauvegarder",
+    "german": "Speichern",
+    "italian": "Salva",
+    "portuguese": "Salvar",
+    "russian": "Сохранить",
+    "japanese": "保存",
+    "chinese": "保存",
+    "hindi": "सहेजें",
+    "arabic": "حفظ"
+},
+"load_button": {
+    "english": "Load",
+    "spanish": "Cargar",
+    "french": "Charger",
+    "german": "Laden",
+    "italian": "Carica",
+    "portuguese": "Carregar",
+    "russian": "Загрузить",
+    "japanese": "読み込み",
+    "chinese": "加载",
+    "hindi": "लोड",
+    "arabic": "تحميل"
+},
+"refresh_warning": {
+    "english": "Important: Streamlit sessions clear when you refresh. Use the Save/Load buttons to preserve your work.",
+    "spanish": "Importante: Las sesiones de Streamlit se borran al actualizar. Use los botones Guardar/Cargar para conservar su trabajo.",
+    "french": "Important: Les sessions Streamlit s'effacent lors de l'actualisation. Utilisez les boutons Sauvegarder/Charger pour préserver votre travail.",
+    "german": "Wichtig: Streamlit-Sitzungen werden beim Aktualisieren gelöscht. Verwenden Sie die Speichern/Laden-Schaltflächen, um Ihre Arbeit zu erhalten.",
+    "italian": "Importante: le sessioni Streamlit si cancellano quando si aggiorna. Usa i pulsanti Salva/Carica per preservare il tuo lavoro.",
+    "portuguese": "Importante: as sessões do Streamlit são apagadas ao atualizar. Use os botões Salvar/Carregar para preservar seu trabalho.",
+    "russian": "Важно: сессии Streamlit очищаются при обновлении. Используйте кнопки Сохранить/Загрузить, чтобы сохранить вашу работу.",
+    "japanese": "重要：Streamlitセッションは更新時にクリアされます。作業を保存するには保存/読み込みボタンを使用してください。",
+    "chinese": "重要提示：刷新时Streamlit会话将被清除。使用保存/加载按钮来保存您的工作。",
+    "hindi": "महत्वपूर्ण: रीफ्रेश करने पर Streamlit सत्र साफ हो जाते हैं। अपने काम को संरक्षित करने के लिए सहेजें/लोड बटन का उपयोग करें।",
+    "arabic": "مهم: تمسح جلسات Streamlit عند التحديث. استخدم أزرار الحفظ/التحميل للحفاظ على عملك."
+}
 }
 
 def get_translations(language="english"):

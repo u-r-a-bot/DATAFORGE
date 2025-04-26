@@ -22,7 +22,6 @@ def sidebar_content():
     t = get_translations(st.session_state.language)
     
     st.sidebar.title(t["app_title"])
-    
     # Language selector
     language_options = list(AVAILABLE_LANGUAGES.values())
     language_keys = list(AVAILABLE_LANGUAGES.keys())
@@ -41,9 +40,14 @@ def sidebar_content():
         st.rerun()
     
     # API Key input
-    api_key = st.sidebar.text_input(t["api_key_label"], type="password", value=st.session_state.api_key)
-    if api_key:
-        st.session_state.api_key = api_key
+    # api_key = st.sidebar.text_input(
+    #     t["api_key_label"], 
+    #     type="password", 
+    #     value=st.session_state.api_key if st.session_state.api_key else "your-gemini-api-key-here",
+    #     placeholder="Enter your API key here"
+    # )
+    # if api_key:
+    #     st.session_state.api_key = api_key
     
     st.sidebar.divider()
     
@@ -102,7 +106,11 @@ def story_setup_page():
         col1, col2 = st.columns(2)
         
         with col1:
-            title = st.text_input(t["story_title_label"], value=st.session_state.story_context["title"])
+            title = st.text_input(
+                t["story_title_label"], 
+                value=st.session_state.story_context["title"] if st.session_state.story_context["title"] else "The Crystal Caverns",
+                placeholder="Enter your story title here"
+            )
             
             genre_options = [
                 "fantasy", "science_fiction", "mystery", "thriller", 
@@ -184,15 +192,23 @@ def characters_page():
         col1, col2 = st.columns(2)
         
         with col1:
-            name = st.text_input("Character Name")
-            age = st.number_input("Character Age", min_value=0, max_value=1000, value=25)
+            name = st.text_input("Character Name", value="Elara Moonwhisper", placeholder="Enter character name")
+            age = st.number_input("Character Age", min_value=0, max_value=1000, value=16)
             
             role_options = ["protagonist", "antagonist", "mentor", "ally", "foil", "love interest", "other"]
             role = st.selectbox("Character's Role", options=role_options)
         
         with col2:
-            description = st.text_area("Character Description", placeholder="Physical appearance, personality traits...")
-            motivation = st.text_area("Character's Motivation", placeholder="What drives this character?")
+            description = st.text_area(
+                "Character Description", 
+                value="A slender girl with silver hair and bright blue eyes. She's introverted but determined, with a natural talent for crystal magic that she's only beginning to understand.",
+                placeholder="Describe physical appearance, personality traits, unique characteristics..."
+            )
+            motivation = st.text_area(
+                "Character's Motivation", 
+                value="To discover the truth about her mysterious powers and learn why her parents kept her heritage a secret. She hopes to use her abilities to protect her village from the approaching darkness.",
+                placeholder="What drives this character? What do they want or need?"
+            )
         
         submit_button = st.form_submit_button("Add Character")
         
@@ -247,9 +263,21 @@ def settings_page():
     with st.form("setting_form"):
         st.subheader("Add a New Setting")
         
-        name = st.text_input("Setting Name", placeholder="e.g., The Enchanted Forest, New York City")
-        description = st.text_area("Description", placeholder="Describe the location, atmosphere, time period...")
-        significance = st.text_area("Significance to the Plot", placeholder="Why is this setting important?")
+        name = st.text_input(
+            "Setting Name", 
+            value="The Crystal Caverns",
+            placeholder="e.g., The Enchanted Forest, New York City, The Starship Odyssey"
+        )
+        description = st.text_area(
+            "Description", 
+            value="A vast network of underground caverns illuminated by bioluminescent crystals that pulse with magical energy. The main chamber features a crystalline lake that reflects the colorful light in hypnotic patterns. Ancient carvings line the walls, telling the history of the crystal wielders who once dwelled here.",
+            placeholder="Describe the location, atmosphere, time period, cultural features, etc."
+        )
+        significance = st.text_area(
+            "Significance to the Plot", 
+            value="The caverns are the source of Elara's power and contain secrets about her ancestry. It's also where the final confrontation with the shadow creatures will take place, as they seek to harvest the crystals' power for their dark purposes.",
+            placeholder="Why is this setting important? How does it impact the story or characters?"
+        )
         
         submit_button = st.form_submit_button("Add Setting")
         
@@ -299,7 +327,11 @@ def plot_elements_page():
         element_type_options = ["conflict", "goal", "twist", "revelation", "obstacle", "backstory", "theme"]
         element_type = st.selectbox("Element Type", options=element_type_options)
         
-        description = st.text_area("Description", placeholder="Describe this plot element")
+        description = st.text_area(
+            "Description", 
+            value="Elara discovers that her grandmother was the last guardian of the Crystal Caverns, sworn to protect its power from those who would abuse it. The shadow creatures now hunting Elara are the same ones that forced her family into hiding years ago. She must master her crystal magic quickly if she hopes to fulfill her family's ancient duty.",
+            placeholder="Describe this plot element in detail - what happens, who is involved, why it matters"
+        )
         
         importance_options = ["primary", "secondary", "minor"]
         importance = st.selectbox("Importance", options=importance_options)
@@ -363,15 +395,31 @@ def chapter_generator_page():
         col1, col2 = st.columns(2)
         
         with col1:
-            chapter_title = st.text_input("Chapter Title")
-            plot_focus = st.text_area("Plot Focus", placeholder="What should this chapter focus on?")
+            chapter_title = st.text_input(
+                "Chapter Title", 
+                value="The Awakening",
+                placeholder="Enter a title for this chapter"
+            )
+            plot_focus = st.text_area(
+                "Plot Focus", 
+                value="Elara discovers her crystal powers for the first time when she accidentally activates an ancient crystal in her grandmother's keepsake box. The crystal connects her to a vision of the caverns and reveals glimpses of her family's secret past.",
+                placeholder="What key events, conflicts, or character developments should this chapter focus on?"
+            )
             tone_options = ["suspenseful", "lighthearted", "somber", "mysterious", "romantic", "action-packed", "reflective"]
-            tone = st.selectbox("Tone", options=tone_options)
+            tone = st.selectbox("Tone", options=tone_options, index=3)  # Default to mysterious
         
         with col2:
             word_count = st.slider("Approximate Word Count", min_value=500, max_value=5000, value=1500, step=500)
-            previous_events = st.text_area("Previously in the Story", placeholder="Briefly describe previous events...")
-            current_situation = st.text_area("Current Situation", placeholder="Where does this chapter begin?")
+            previous_events = st.text_area(
+                "Previously in the Story", 
+                value="Elara has been having strange dreams about glowing caves. Her grandmother recently passed away, leaving her a small wooden box with a warning not to open it until she was 'ready'.",
+                placeholder="Briefly describe important events that happened before this chapter..."
+            )
+            current_situation = st.text_area(
+                "Current Situation", 
+                value="After another vivid dream, Elara decides to open her grandmother's box despite the warning. Inside, she finds a crystal pendant that seems to pulse with an inner light when she touches it.",
+                placeholder="Where are the characters now? What's the current status of the main conflict?"
+            )
         
         submit_button = st.form_submit_button("Generate Chapter")
         
@@ -456,7 +504,8 @@ def plot_analysis_page():
                 st.warning("No chapters available. Generate a chapter first or paste your text.")
                 story_excerpt = st.text_area(
                     "Paste Text to Analyze", 
-                    placeholder="Or paste the text you want to analyze for plot issues...",
+                    value="Elara's fingers trembled as she held the crystal pendant. As soon as her skin made contact with the smooth surface, a jolt of energy surged through her body. The crystal began to glow with a blue light that pulsed in rhythm with her heartbeat.\n\n'What's happening?' she whispered, but deep down, she felt as if she'd been waiting for this moment her entire life.\n\nImages flooded her mind: vast caverns illuminated by crystals of every color, ancient symbols carved into stone walls, and a hooded figure standing before a crystalline pool. The figure turned, and Elara gasped as she recognized her grandmother's face, much younger but unmistakable.\n\n'The time has come,' her grandmother's voice echoed in her mind. 'The shadows are returning, and the crystals need a new guardian.'\n\nWhen the vision faded, Elara found herself on her knees, the pendant still clutched in her hand. Outside her window, dark clouds had gathered, and in the distance, she heard an unnatural howl that made her skin crawl.\n\nShe didn't understand everything yet, but one thing was certain: her ordinary life was over.",
+                    placeholder="Paste the text of your story section, chapter, or scene to analyze...",
                     height=300
                 )
             else:
@@ -474,7 +523,8 @@ def plot_analysis_page():
         else:
             story_excerpt = st.text_area(
                 "Paste Text to Analyze", 
-                placeholder="Paste the text you want to analyze for plot issues...",
+                value="Elara's fingers trembled as she held the crystal pendant. As soon as her skin made contact with the smooth surface, a jolt of energy surged through her body. The crystal began to glow with a blue light that pulsed in rhythm with her heartbeat.\n\n'What's happening?' she whispered, but deep down, she felt as if she'd been waiting for this moment her entire life.\n\nImages flooded her mind: vast caverns illuminated by crystals of every color, ancient symbols carved into stone walls, and a hooded figure standing before a crystalline pool. The figure turned, and Elara gasped as she recognized her grandmother's face, much younger but unmistakable.\n\n'The time has come,' her grandmother's voice echoed in her mind. 'The shadows are returning, and the crystals need a new guardian.'\n\nWhen the vision faded, Elara found herself on her knees, the pendant still clutched in her hand. Outside her window, dark clouds had gathered, and in the distance, she heard an unnatural howl that made her skin crawl.\n\nShe didn't understand everything yet, but one thing was certain: her ordinary life was over.",
+                placeholder="Paste the text of your story section, chapter, or scene to analyze...",
                 height=300
             )
         
@@ -535,12 +585,14 @@ def creative_branches_page():
         
         current_situation = st.text_area(
             "Current Situation", 
-            placeholder="Describe where your story currently stands..."
+            value="Elara has discovered her crystal magic abilities and learned that she is destined to be the next guardian of the Crystal Caverns. However, she's still inexperienced with her powers. The shadow creatures have begun appearing in the forest near her village, and they seem to be searching for something - or someone.",
+            placeholder="Describe the current state of your story, relevant characters, and the main conflict..."
         )
         
         decision_point = st.text_area(
             "Key Decision Point", 
-            placeholder="What critical decision or event is about to occur?"
+            value="Elara has detected a larger group of shadow creatures heading toward the village. She has to decide whether to: 1) Try to intercept them herself using her limited powers, 2) Reveal her powers to the village and organize a defense, or 3) Flee to the Crystal Caverns to seek guidance and potentially stronger magic.",
+            placeholder="What critical choice, event, or dilemma is your character facing right now?"
         )
         
         num_branches = st.slider("Number of Branches", min_value=2, max_value=5, value=3)
@@ -614,7 +666,8 @@ def character_arc_page():
         
         selected_character = st.selectbox(
             "Select Character",
-            options=character_names
+            options=character_names,
+            placeholder="Choose a character to generate an arc for"
         )
         
         submit_button = st.form_submit_button("Generate Character Arc")
@@ -670,7 +723,7 @@ def plot_outline_page():
     with st.form("plot_outline_form"):
         st.subheader("Generate Plot Outline")
         
-        num_chapters = st.slider("Number of Chapters", min_value=5, max_value=30, value=10)
+        num_chapters = st.slider("Number of Chapters", min_value=5, max_value=30, value=12)
         
         submit_button = st.form_submit_button("Generate Plot Outline")
         
@@ -761,11 +814,12 @@ def dialogue_generator_page():
         
         situation = st.text_area(
             "Situation", 
-            placeholder="Describe the situation where these characters are interacting..."
+            value="Elara has just had her first vision from the crystal and is confused and frightened. She seeks out her best friend to confide in them about what happened, but is afraid of being thought crazy or attracting unwanted attention from the shadow creatures.",
+            placeholder="Describe the context, location, mood and reason for this conversation..."
         )
         
         tone_options = ["tense", "friendly", "romantic", "confrontational", "comedic", "mysterious", "emotional"]
-        tone = st.selectbox("Conversation Tone", options=tone_options)
+        tone = st.selectbox("Conversation Tone", options=tone_options, index=4)  # Default to mysterious
         
         submit_button = st.form_submit_button("Generate Dialogue")
         
@@ -834,7 +888,8 @@ def plot_problem_solver_page():
         
         problem_description = st.text_area(
             "Describe Your Plot Problem", 
-            placeholder="What plot challenge are you facing? Be as specific as possible...",
+            value="I'm struggling with the middle part of my story. Elara has discovered her powers and learned about her family's connection to the Crystal Caverns, but I need to increase tension before she confronts the shadow creatures' leader. I want to show her growth and training with the crystals, but I'm concerned it will slow the pace too much. How can I keep the middle engaging while developing her abilities?",
+            placeholder="What plot challenge are you facing? Be specific about characters involved, story point, and what doesn't feel right...",
             height=150
         )
         
@@ -894,7 +949,11 @@ def export_import_page():
     with col2:
         st.subheader("Import Story")
         
-        uploaded_file = st.file_uploader("Upload a story context JSON file", type=["json"])
+        uploaded_file = st.file_uploader(
+            "Upload a story context JSON file", 
+            type=["json"],
+            help="Select a previously exported story JSON file to import"
+        )
         
         if uploaded_file is not None:
             try:
