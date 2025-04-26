@@ -432,11 +432,38 @@ def plot_analysis_page():
     with st.form("plot_analysis_form"):
         st.subheader("Analyze Your Plot")
         
-        story_excerpt = st.text_area(
-            "Story Excerpt", 
-            placeholder="Paste the text you want to analyze for plot issues...",
-            height=300
+        # Add option to select from existing chapters or paste new content
+        analysis_source = st.radio(
+            "Select content to analyze",
+            ["Use existing chapter", "Paste new text"]
         )
+        
+        if analysis_source == "Use existing chapter":
+            if not st.session_state.chapters:
+                st.warning("No chapters available. Generate a chapter first or paste your text.")
+                story_excerpt = st.text_area(
+                    "Paste Text to Analyze", 
+                    placeholder="Or paste the text you want to analyze for plot issues...",
+                    height=300
+                )
+            else:
+                # Create a list of chapter titles for selection
+                chapter_titles = [chapter["title"] for chapter in st.session_state.chapters]
+                selected_chapter = st.selectbox("Select a chapter to analyze", chapter_titles)
+                
+                # Get the content of the selected chapter
+                chapter_index = chapter_titles.index(selected_chapter)
+                story_excerpt = st.session_state.chapters[chapter_index]["content"]
+                
+                # Show a preview
+                st.write("Preview (first 200 characters):")
+                st.write(story_excerpt[:200] + "..." if len(story_excerpt) > 200 else story_excerpt)
+        else:
+            story_excerpt = st.text_area(
+                "Paste Text to Analyze", 
+                placeholder="Paste the text you want to analyze for plot issues...",
+                height=300
+            )
         
         submit_button = st.form_submit_button("Analyze Plot")
         
@@ -477,7 +504,6 @@ def plot_analysis_page():
                     st.experimental_rerun()
     else:
         st.info("No analyses performed yet. Use the form above to analyze your plot.")
-
 def creative_branches_page():
     st.header("Creative Branching")
     
