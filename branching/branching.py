@@ -11,7 +11,7 @@ embedding_model = SentenceTransformer('all-MiniLM-L6-v2')
 
 # Set up Google Gemini API
 # api_key = st.secrets["GEMINI_API_KEY"] if "GEMINI_API_KEY" in st.secrets else os.environ.get("GEMINI_API_KEY")
-api_key = "AIzaSyAyBjb3w-583rckUkuvQ9WrZEFxo3NFWhU"
+api_key = ""
 genai.configure(api_key=api_key)
 
 # Initialize Gemini model
