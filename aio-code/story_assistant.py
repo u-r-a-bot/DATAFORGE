@@ -3,7 +3,7 @@ import json
 import streamlit as st
 import google.generativeai as genai
 from typing import Dict, List, Optional, Any
-os.environ['GOOGLE_API_KEY'] = "AIzaSyAMhgUK6Wj-jhJ4pBX7t6US6VyTgAI_Lu0"
+os.environ['GOOGLE_API_KEY'] = ""
 # LLM configuration
 def get_api_key():
     """Get Gemini API key from environment or Streamlit secrets"""
